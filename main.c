@@ -1,6 +1,7 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 // create the taskStruct to hold the task data
 struct taskStruct {
@@ -13,7 +14,7 @@ int writeToFile(struct taskStruct task);
 struct taskStruct createTask();
 int getTasks();
 char* padStringRight(char *str, int finalLength);
-int getLastId();
+int deleteTask();
 
 // main logic loop
 int main(void) {
@@ -25,28 +26,53 @@ int main(void) {
         int result;
 
         // Get what action to preform
-        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n0. Close program\n");
+        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n3. Delete task\n0. Close program\n");
         scanf("%d", &action);
         getchar(); // Remove the \n character from stdin
 
         switch (action) {
             case 1: // Create a new task
+                printf("\e[1;1H\e[2J");
                 task = createTask();
 
                 result = writeToFile(task); // Write it to the file
 
                 if (result == 1) {
                     printf("\nSuccessfully written to file\n");
-                    break;
                 }
-                printf("\nError writing to file\n");
+                else if (result == -1) {
+                    printf("\nError writing to file\n");
+                }
+
+                printf("\nPress enter to continue\n");
+                scanf("%c");
+                printf("\e[1;1H\e[2J");
                 break;
             case 2:
+                printf("\e[1;1H\e[2J");
                 result = getTasks();
 
                 if (result == -1) {
                     printf("\nError reading from file\n");
                 }
+                printf("Press enter to continue\n");
+                scanf("%c");
+                printf("\e[1;1H\e[2J");
+                break;
+
+            case 3:
+                printf("\e[1;1H\e[2J");
+
+                getTasks();
+
+                result = deleteTask();
+                if (result == -1) {
+                    printf("\nCannot delete line 0\n");
+                }
+                getchar();
+                printf("Press enter to continue\n");
+                scanf("%c");
+                printf("\e[1;1H\e[2J");
                 break;
                 
             case 0: //Exit the program
@@ -55,7 +81,9 @@ int main(void) {
 
             default: // If the users chosen action is not supported
                 printf("\nNot a valid input, try again\nPress enter to continue\n");
+                getchar();
                 scanf("%c");
+                printf("\e[1;1H\e[2J");
                 break;
         }
     }
@@ -64,12 +92,10 @@ int main(void) {
 // Write a task to the csv file
 int writeToFile(struct taskStruct task) {
     // Open the file in append mode
-    FILE *fptr = fopen("C:/Users/trist/CLionProjects/untitled/tasks.csv", "a+");
+    FILE *fptr = fopen("tasks.csv", "a+");
     if (!fptr) return -1; // Return -1 if the file pointer is null
 
-    const int lastId = getLastId();
-
-    fprintf(fptr, "%d;%s;%s\n", lastId + 1, task.name, task.description); // Write the content of the struct to the file
+    fprintf(fptr, "%s;%s\n", task.name, task.description); // Write the content of the struct to the file
 
     fclose(fptr); // Close the file
     return 1;
@@ -92,12 +118,12 @@ struct taskStruct createTask() {
 }
 
 int getTasks() {
-    FILE *fptr = fopen("C:/Users/trist/CLionProjects/untitled/tasks.csv", "r");
+    FILE *fptr = fopen("tasks.csv", "r");
     if (!fptr) return -1;
 
     int pass = 1;
-    char line[288];
-    char *id;
+    int lineNumber = 0;
+    char line[512];
     char *name;
     char *description;
 
@@ -107,52 +133,64 @@ int getTasks() {
 
         while (token != NULL) {
             if (pass == 1) {
-                id = padStringRight(token, 3);
-                pass++;
-            }
-            else if (pass == 2) {
                 name = padStringRight(token, 32);
                 pass++;
             }
-            else if (pass == 3) {
+            else if (pass == 2) {
                 description = token;
                 pass = 1;
             }
             token = strtok(NULL, ";");
         }
-        printf("%s | %s | %s", id, name, description);
+        char temp[3];
+        itoa(lineNumber, temp, 10);
+        printf("%s | %s | %s", padStringRight(temp, 3), name, description);
         free(name);
+        lineNumber++;
     }
-    printf("\n\n");
+    printf("\n");
 
     fclose(fptr);
     return 1;
 }
 
 char* padStringRight(char *str, const int finalLength) {
-    char *paddedString = malloc(32 + 1);
+    char *paddedString = malloc(finalLength);
     if (!paddedString) return NULL;
 
-    sprintf(paddedString, "%-*s", finalLength, str);
+    sprintf(paddedString, "%-*s", finalLength -1, str);
 
     return paddedString;
 }
 
-int getLastId() {
-    FILE *file = fopen("C:/Users/trist/CLionProjects/untitled/tasks.csv", "r");
+int deleteTask() {
+    FILE *fptr = fopen("tasks.csv", "r");
+    FILE *fptr2 = fopen("temp.csv", "w");
+    if (!fptr) return -1;
 
-    char line[256];
-    char lastLine[256];
+    printf("What task do you want to delete?\n");
+    int deleteId = 1;
+    int temp = 0;
+    char c;
+    scanf("%d", &deleteId);
+    if (deleteId == 0) return -1;
 
-    while (fgets(line, sizeof(line), file)) {
-        strcpy(lastLine, line);
+    c = getc(fptr);
+    while (c != EOF) {
+        if (c =='\n') temp++;
+
+        if (temp != deleteId && c != EOF) {
+            putc(c, fptr2);
+        }
+        c = getc(fptr);
     }
 
-    fclose(file);
-    if (strtok(lastLine, ";") == "ID") return 0;
+    fclose(fptr2);
+    fclose(fptr);
 
-    char *token = strtok(lastLine, ";");
-    int lastId = atoi(token);
+    remove("tasks.csv");
+    rename("temp.csv", "tasks.csv");
+    remove("temp.csv");
 
-    return lastId;
+    return 1;
 }
