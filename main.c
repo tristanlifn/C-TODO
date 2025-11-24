@@ -26,7 +26,7 @@ int main(void) {
         int result;
 
         // Get what action to preform
-        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n3. Delete task\n0. Close program\n");
+        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n3. Delete task\nAnything \n");
         scanf("%d", &action);
         getchar(); // Remove the \n character from stdin
 
@@ -75,16 +75,9 @@ int main(void) {
                 printf("\e[1;1H\e[2J");
                 break;
                 
-            case 0: //Exit the program
+            default: // If the users chosen action is not supported
                 printf("Goodbye!\n");
                 return 0;
-
-            default: // If the users chosen action is not supported
-                printf("\nNot a valid input, try again\nPress enter to continue\n");
-                getchar();
-                scanf("%c");
-                printf("\e[1;1H\e[2J");
-                break;
         }
     }
 }
@@ -143,7 +136,8 @@ int getTasks() {
             token = strtok(NULL, ";");
         }
         char temp[3];
-        itoa(lineNumber, temp, 10);
+        //itoa(lineNumber, temp, 10);
+        sprintf(temp, "%d", lineNumber);
         printf("%s | %s | %s", padStringRight(temp, 3), name, description);
         free(name);
         lineNumber++;
