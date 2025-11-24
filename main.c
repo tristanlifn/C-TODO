@@ -15,13 +15,14 @@ struct taskStruct createTask();
 int getTasks();
 char* padStringRight(char *str, int finalLength);
 int deleteTask();
+int editTask();
 
 // main logic loop
 int main(void) {
     if (access("tasks.csv", F_OK) == 0) {
     } else {
         FILE *fptr = fopen("tasks.csv", "w");
-        fprintf(fptr, "Name;Description");
+        fprintf(fptr, "Name;Description\n");
         fclose(fptr);
     }
 
@@ -33,7 +34,7 @@ int main(void) {
         int result;
 
         // Get what action to preform
-        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n3. Delete task\nAnything else to close\n");
+        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n3. Delete task\n4. Edit a task\nAnything else to close\n");
         scanf("%d", &action);
         getchar(); // Remove the \n character from stdin
 
@@ -74,7 +75,7 @@ int main(void) {
                 getTasks();
 
                 result = deleteTask();
-                if (result == -1) {
+                if (result == -2) {
                     printf("\nCannot delete line 0\n");
                 }
                 getchar();
@@ -82,7 +83,18 @@ int main(void) {
                 scanf("%c");
                 printf("\e[1;1H\e[2J");
                 break;
-                
+            
+            case 4:
+                printf("\e[1;1H\e[2J");
+                result = editTask();
+                if (result == -1) {
+                    printf("Error opening tasks file");
+                }
+
+                scanf("%c");
+                printf("\e[1;1H\e[2J");
+                break;
+
             default: // If the users chosen action is not supported
                 printf("Goodbye!\n");
                 return 0;
@@ -171,17 +183,17 @@ int deleteTask() {
     if (!fptr) return -1;
 
     printf("What task do you want to delete?\n");
-    int deleteId = 1;
+    int deleteLine = 1;
     int temp = 0;
     char c;
-    scanf("%d", &deleteId);
-    if (deleteId == 0) return -1;
+    scanf("%d", &deleteLine);
+    if (deleteLine == 0) return -2;
 
     c = getc(fptr);
     while (c != EOF) {
         if (c =='\n') temp++;
 
-        if (temp != deleteId && c != EOF) {
+        if (temp != deleteLine && c != EOF) {
             putc(c, fptr2);
         }
         c = getc(fptr);
@@ -189,6 +201,46 @@ int deleteTask() {
 
     fclose(fptr2);
     fclose(fptr);
+
+    remove("tasks.csv");
+    rename("temp.csv", "tasks.csv");
+    remove ("temp.csv");
+
+    return 1;
+}
+
+ int editTask() {
+    FILE *fptr = fopen("tasks.csv", "r");
+    FILE *fptr2 = fopen("temp.csv", "w");
+    if (!fptr) return -1;
+    
+    printf("What task do you want to edit?\n");
+    int editLine = 1;
+    int temp = 0;
+    char c;
+    scanf("%d", &editLine);
+    getchar(); // Get the '\n'
+    if (editLine == 0) return -2;
+ 
+    struct taskStruct task = createTask();
+
+    c = getc(fptr);
+    while (c != EOF) {
+
+        if (temp != editLine && c != EOF) {
+            putc(c, fptr2);
+        } else if (temp == editLine && c != EOF) {
+            fprintf(fptr2, "%s;%s\n", task.name, task.description);
+            fscanf(fptr, "%*[^\n]");
+            temp++;
+        }
+
+        if (c == '\n') temp++;
+        c = getc(fptr);
+    }
+
+    fclose(fptr);
+    fclose(fptr2);
 
     remove("tasks.csv");
     rename("temp.csv", "tasks.csv");
