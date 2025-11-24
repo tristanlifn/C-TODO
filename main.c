@@ -18,6 +18,13 @@ int deleteTask();
 
 // main logic loop
 int main(void) {
+    if (access("tasks.csv", F_OK) == 0) {
+    } else {
+        FILE *fptr = fopen("tasks.csv", "w");
+        fprintf(fptr, "Name;Description");
+        fclose(fptr);
+    }
+
     // Loop the program
     while (1) {
         // Initialize variables
@@ -48,6 +55,7 @@ int main(void) {
                 scanf("%c");
                 printf("\e[1;1H\e[2J");
                 break;
+
             case 2:
                 printf("\e[1;1H\e[2J");
                 result = getTasks();
