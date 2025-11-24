@@ -26,7 +26,7 @@ int main(void) {
         int result;
 
         // Get what action to preform
-        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n3. Delete task\nAnything \n");
+        printf("Chose a action: \n1. Create a new task\n2. Get all tasks\n3. Delete task\nAnything else to close\n");
         scanf("%d", &action);
         getchar(); // Remove the \n character from stdin
 
