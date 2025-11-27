@@ -1,7 +1,7 @@
 ﻿#include <stdio.h>
 #include <string.h>
 #include "TODO.h"
-#include "myStrLib.h"
+#include "myShell.h"
 
 int main() {
     char action;
@@ -19,15 +19,10 @@ int main() {
                 break;
 
             case '2':
-                printf("What string?\n");
-                char len[100];
-                fgets(len, sizeof(len), stdin);
-                int val = mystrlen(len);
-                int val2 = strlen(len);
-
-                printf("%d mystrlen\n", val);
-                printf("%d strlen\n", val2);
+                printf("\e[1;1H\e[2J");
+                myCmd();
                 scanf("%c");
+                printf("\e[1;1H\e[2J");
                 break;
 
 

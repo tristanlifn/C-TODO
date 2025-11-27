@@ -18,13 +18,17 @@ int mystrlen(const char *str) {
 }
 
 char *mystrcpy(char *dest, const char *src) {
-    const unsigned long length = mystrlen(src);
+    char *original_dest = dest;
 
-    memcpy(dest, src, length + 1);
-
-    return dest;
+    while ((*dest++ = *src++) != '\0') {
+    }
+    return original_dest;
 }
 
-// char *mystrcmp(const char *str1, const char *str2) {
-// 
-// }
+int mystrcmp(const char *str1, const char *str2) {
+    while (*str1 && (*str1 == *str2)) {
+        str1++;
+        str2++;
+    }
+    return *(const unsigned char*)str1 - *(const unsigned char*)str2;
+}
