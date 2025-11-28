@@ -25,6 +25,7 @@ int ownCmdHandler(char *cmd) {
     switch (switchOwnArg) {
         case 1:
             printf("%d\n", mystrlen(arg1));
+            printf("%lu\n", strlen(arg1));
             break;
 
         case 2:
