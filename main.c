@@ -8,7 +8,7 @@ int main() {
 
     while (1){
         printf("\e[1;1H\e[2J");
-        printf("What project do you want to run?\n1. TODO\n2. myStrLen\nAnything else to exit\n");
+        printf("What project do you want to run?\n1. TODO\n2. my cmd\nAnything else to exit\n");
         scanf("%c", &action);
         getchar(); // Remove the \n character from stdin
         printf("\e[1;1H\e[2J");
@@ -21,7 +21,6 @@ int main() {
             case '2':
                 printf("\e[1;1H\e[2J");
                 myCmd();
-                scanf("%c");
                 printf("\e[1;1H\e[2J");
                 break;
 

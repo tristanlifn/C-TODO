@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 // create the taskStruct to hold the task data
 struct taskStruct {
@@ -19,8 +18,8 @@ int editTask();
 
 // main logic loop
 int mainMenu() {
-    if (access("tasks.csv", F_OK) == 0) {
-    } else {
+    FILE *fileExists = fopen("tasks.csv", "r");
+    if (fileExists != NULL) {
         FILE *fptr = fopen("tasks.csv", "w");
         fprintf(fptr, "Name;Description\n");
         fclose(fptr);
