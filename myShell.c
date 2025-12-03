@@ -10,8 +10,10 @@ int ownCmdHandler(char *cmd) {
     listOfOwnCmds[0] = "mystrlen";
     listOfOwnCmds[1] = "mystrscp";
     listOfOwnCmds[3] = "mystrcmp";
-    listOfOwnCmds[4] = "help";
-    listOfOwnCmds[5] = "exit";
+    listOfOwnCmds[4] = "mystrcat";
+    listOfOwnCmds[5] = "mystrstr";
+    listOfOwnCmds[6] = "help";
+    listOfOwnCmds[7] = "exit";
 
     char command[10], arg1[200], arg2[200];
     sscanf(cmd, "%s %s %s", command, arg1, arg2);
@@ -40,10 +42,18 @@ int ownCmdHandler(char *cmd) {
             break;
 
         case 4:
-            printf("Availanble commands:\nmystrlen {string 1}\nmystrcpy {string to copy}\nmystrcmp {string 1} {string 2}\nEXIT");
+            printf("%s\n", mystrcat(arg1, arg2));
             break;
 
         case 5:
+            printf("%s\n", mystrstr(arg1, arg2));
+            break;
+
+        case 6:
+            printf("Availanble commands:\nmystrlen {string 1}\nmystrcpy {string to copy}\nmystrcmp {string 1} {string 2}\nEXIT");
+            break;
+
+        case 7:
             return -1;
 
         default:
